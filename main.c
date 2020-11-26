@@ -1,4 +1,5 @@
 #include <SFML/Graphics.h>
+#include "entity.h"
 
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
@@ -6,41 +7,40 @@
 #define WINDOWWIDTH 800
 #define WINDOWHEIGHT 600
 
-
-// Could probably make these #defines but whatever this might be more readable
-// Actually why am I not just setting each thing manually, isn't it just a struct
-void setSfRectPos(float posX, float posY, sfRectangleShape* rect){
-    sfVector2f pos = {posX, posY};
-    sfRectangleShape_setPosition(rect, pos);
-}
-
-void setSfRectSize(float sizeX, float sizeY, sfRectangleShape* rect){
-    sfVector2f size = {sizeX, sizeY};
-    sfRectangleShape_setSize(rect, size);
-}
-
-void setSfRectOrigin(float originX, float originY, sfRectangleShape* rect){
-    sfVector2f origin = {originX, originY};
-    sfRectangleShape_setPosition(rect, origin);
-}
-
-// idk if i really even need this i just am getting tired of constantly typing out every single thing in like 5 different lines and making singular sfVector2fs just to make a single box
-// Also I should probably fix the name eventually, it can be confused with sfRectangleShape_create
-sfRectangleShape* createSfRect(float sizeX, float sizeY, float posX, float posY, float originX, float originY, sfColor color){
-    sfRectangleShape* rect = sfRectangleShape_create();
+// Function to draw the player entity
+void drawPlayer(struct entity* ent, sfRenderWindow* window, sfRectangleShape* rect){
+    // Just very simple for now
+    sfRectangleShape_setPosition(rect, ent->pos);
+    sfRectangleShape_setSize(rect, ent->size);
+    sfRectangleShape_setFillColor(rect, ent->color);
     
-    setSfRectSize(sizeX, sizeY, rect);
-    setSfRectOrigin(originX, originY, rect);
-    setSfRectPos(posX, posY, rect);
-    sfRectangleShape_setFillColor(rect, color);
+    sfRenderWindow_drawRectangleShape(window, rect, NULL);
+}
+
+// Function to update the player
+void updatePlayer(struct entity* ent){
+    ent->pos.x += ent->vel.x;
+    ent->pos.y += ent->vel.y;
     
-    return rect;
+    // Boundary check
+    if(ent->pos.x < 0){
+        ent->pos.x = 0;
+    }
+    if(ent->pos.x > WINDOWWIDTH){
+        ent->pos.x = WINDOWWIDTH;
+    }
+    if(ent->pos.y < 0){
+        ent->pos.y = 0;
+    }
+    if(ent->pos.y > WINDOWHEIGHT){
+        ent->pos.y = WINDOWHEIGHT;
+    }
 }
  
 int main() {
     sfVideoMode mode = {WINDOWWIDTH, WINDOWHEIGHT, 32};
     sfRenderWindow* window;
-    sfRectangleShape* rect1;
+    sfRectangleShape* rect;
     sfEvent event;
 
     /* Create the main window */
@@ -48,8 +48,9 @@ int main() {
     if (!window)
         return EXIT_FAILURE;
     
-    rect1 = createSfRect(50, 50, WINDOWWIDTH/2, WINDOWHEIGHT/2, 25, 25, sfWhite);
- 
+    rect = sfRectangleShape_create();
+    struct entity* player = createEntity(/*Size*/ 50, 50, /*Pos*/ WINDOWWIDTH/2, WINDOWHEIGHT/2, /*Vel*/ 0, 0, /*Color*/ sfWhite, drawPlayer, updatePlayer);
+    
     /* Start the game loop */
     while (sfRenderWindow_isOpen(window))
     {
@@ -83,14 +84,20 @@ int main() {
         /* Clear the screen */
         sfRenderWindow_clear(window, sfBlack);
  
-        sfRenderWindow_drawRectangleShape(window, rect1, NULL);
+        //sfRenderWindow_drawRectangleShape(window, rect, NULL);
+        //drawEntity(window, rect, player);
+        //(*player->draw)(player, window, rect);
+        for(entListCurrent = entListHead; entListCurrent != NULL; entListCurrent = entListCurrent->next){
+            (*entListCurrent->ent->draw)(entListCurrent->ent, window, rect);
+            (*entListCurrent->ent->update)(entListCurrent->ent);
+        }
  
         /* Update the window */
         sfRenderWindow_display(window);
     }
 
     /* Cleanup resources */
-    sfRectangleShape_destroy(rect1);
+    sfRectangleShape_destroy(rect);
     sfRenderWindow_destroy(window);
 
     return EXIT_SUCCESS;

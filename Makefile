@@ -8,8 +8,8 @@ NAME = thing
 ${NAME}: $(SOURCES)
 	$(CC) $(CFLAGS) $(SOURCES) $(LDFLAGS) -o $@ $(LIBS)
 	
-${NAME}-debug: $(SOURCES)
-	$(CC) $(CFLAGS) -g $(SOURCES) $(LDFLAGS) -o $@ $(LIBS)
+debug: $(SOURCES)
+	$(CC) $(CFLAGS) -g $(SOURCES) $(LDFLAGS) -o ${NAME}-debug $(LIBS)
 
 clean:
 	rm ./${NAME}
