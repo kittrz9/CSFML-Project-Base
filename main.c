@@ -18,9 +18,9 @@ void drawPlayer(struct entity* ent, sfRenderWindow* window, sfRectangleShape* re
 }
 
 // Function to update the player
-void updatePlayer(struct entity* ent){
-    ent->pos.x += ent->vel.x;
-    ent->pos.y += ent->vel.y;
+void updatePlayer(struct entity* ent, double deltaTime){
+    ent->pos.x += ent->vel.x * deltaTime;
+    ent->pos.y += ent->vel.y * deltaTime;
     
     // Boundary check
     if(ent->pos.x < 0){
@@ -41,6 +41,7 @@ int main() {
     sfVideoMode mode = {WINDOWWIDTH, WINDOWHEIGHT, 32};
     sfRenderWindow* window;
     sfRectangleShape* rect;
+    sfClock* clock;
     sfEvent event;
 
     /* Create the main window */
@@ -49,7 +50,10 @@ int main() {
         return EXIT_FAILURE;
     
     rect = sfRectangleShape_create();
-    struct entity* player = createEntity(/*Size*/ 50, 50, /*Pos*/ WINDOWWIDTH/2, WINDOWHEIGHT/2, /*Vel*/ 0, 0, /*Color*/ sfWhite, drawPlayer, updatePlayer);
+    struct entity* player = createEntity(/*Size*/ 50, 50, /*Pos*/ WINDOWWIDTH/2, WINDOWHEIGHT/2, /*Vel*/ 0, 0, /*Color*/ sfWhite, /*Draw Function*/ drawPlayer, /*Update function*/ updatePlayer);
+    
+    double deltaTime = 0.0;
+    clock = sfClock_create();
     
     /* Start the game loop */
     while (sfRenderWindow_isOpen(window))
@@ -89,12 +93,16 @@ int main() {
         //(*player->draw)(player, window, rect);
         for(entListCurrent = entListHead; entListCurrent != NULL; entListCurrent = entListCurrent->next){
             (*entListCurrent->ent->draw)(entListCurrent->ent, window, rect);
-            (*entListCurrent->ent->update)(entListCurrent->ent);
+            (*entListCurrent->ent->update)(entListCurrent->ent, deltaTime);
         }
  
         /* Update the window */
         sfRenderWindow_display(window);
+        
+        deltaTime = sfTime_asSeconds(sfClock_restart(clock));
     }
+    
+    removeAllEntities();
 
     /* Cleanup resources */
     sfRectangleShape_destroy(rect);

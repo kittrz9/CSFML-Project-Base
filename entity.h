@@ -10,16 +10,16 @@ struct entity{
     sfVector2f size; // Will probably need to change this to something else if I ever decide to make things not just simple boxes
     sfColor color;
     
-    void (*draw)(struct entity*, sfRenderWindow*, sfRectangleShape*); // Function pointer to the function to draw the entity, might need to make things like the render window or rectangle shape a parameter
-    void (*update)(struct entity*); // Function pointer to the function to update the entity (Probably should be called every frame)
+    void (*draw)(struct entity*, sfRenderWindow*, sfRectangleShape*); // Function pointer to the function to draw the entity
+    void (*update)(struct entity*, double); // Function pointer to the function to update the entity (Probably should be called every frame)
 };
 
 // Creates an entity
 struct entity* createEntity(float sizeX, float sizeY, float posX, float posY, float velX, float velY, sfColor color, void* drawFunc, void* updateFunc);
 struct entity* createEntityVector2f(sfVector2f size, sfVector2f pos, sfVector2f vel, sfColor color, void* drawFunc, void* updateFunc);
 
-// Draws an entity
-//void drawEntity(sfRenderWindow* window, sfRectangleShape* rect, struct entity* ent);
+// Removes all entities
+void removeAllEntities();
 
 //  Sets values to an entity
 void entSetPos(struct entity* ent, float x, float y);

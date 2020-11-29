@@ -64,6 +64,7 @@ void entSetSize(struct entity* ent, float x, float y){
 }
 
 // Creates an entity
+// Might be better to just do the same thing SFML does and just have functions to set everything seperately so you dont have super long function calls
 struct entity* createEntity(float sizeX, float sizeY, float posX, float posY, float velY, float velX, sfColor color, void* drawFunc, void* updateFunc){
     struct entity* ent = (struct entity*) malloc(sizeof(struct entity));
     
@@ -86,11 +87,8 @@ struct entity* createEntity(float sizeX, float sizeY, float posX, float posY, fl
 struct entity* createEntityVector2f(sfVector2f size, sfVector2f pos, sfVector2f vel, sfColor color, void* drawFunc, void* updateFunc){
     struct entity* ent = (struct entity*) malloc(sizeof(struct entity));
     
-    //entSetSize(ent, sizeX, sizeY);
     ent->size   = size;
-    //entSetPos(ent, posX, posY);
     ent->pos    = pos;
-    //entSetVel(ent, velX, velY);
     ent->vel    = vel;
     
     ent->color  = color;
@@ -101,11 +99,16 @@ struct entity* createEntityVector2f(sfVector2f size, sfVector2f pos, sfVector2f 
     return ent;
 }
 
-// Draws an entity
-/*void drawEntity(sfRenderWindow* window, sfRectangleShape* rect, struct entity* ent) {
-    sfRectangleShape_setPosition(rect, ent->pos);
-    sfRectangleShape_setSize(rect, ent->size);
-    sfRectangleShape_setFillColor(rect, ent->color);
-    
-    sfRenderWindow_drawRectangleShape(window, rect, NULL);
-}*/
+
+// Removes all entities
+void removeAllEntities(){
+    struct entListNode* next = entListHead->next;
+    for(entListCurrent = entListHead; entListCurrent != NULL; entListCurrent = next){
+        next = entListCurrent->next;
+        printf("Freeing entity %p\n", entListCurrent->ent);
+        free(entListCurrent->ent);
+        free(entListCurrent);
+        printf("Done\n");
+    }
+    return;
+}
