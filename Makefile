@@ -1,4 +1,4 @@
-csfml-appCC = gcc
+CC = gcc
 SHELL = /bin/bash
 LIBS = -lcsfml-graphics -lcsfml-window -lcsfml-system -lm
 CFLAGS = -Wall -O3
